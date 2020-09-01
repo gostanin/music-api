@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+    api:
+        build: .
+        image: music-api
+        environment:
+            DEBUG: "false"
+        ports:
+            - "8000:8000"

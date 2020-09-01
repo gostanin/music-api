@@ -44,6 +44,25 @@ def test_get_song_400(get_test_app, request_body):
         assert data['message']
 
 
+@patch('music.controllers.songs.read_binary_stream')
+@patch('music.controllers.songs.get_model_songs')
+def test_get_song_read_binary_500(get_model_songs, read_binary_stream, get_test_app):
+    with get_test_app as app:
+        path = '/path'
+        get_model_songs().get_path.return_value = path
+        read_binary_stream.side_effect = Exception()
+
+        request_body = {
+            'id': '123456789012345678901234567890123456', 'from': 30, 'to': 55}
+        res = app.get('/api/v1/songs', json=request_body)
+        data = json.loads(res.data)
+        assert res.status_code == 500
+        assert data['message']
+
+        read_binary_stream.assert_called_once_with(request_body['from'], request_body['to'], path)
+        get_model_songs().get_path.assert_called_once_with(request_body['id'])
+
+
 @patch('music.controllers.songs.uuid4')
 @patch('music.controllers.songs.get_model_songs')
 def test_create_song_204(get_model_songs, uuid4, get_test_app):

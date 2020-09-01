@@ -44,13 +44,12 @@ def get_song():
     if from_bytes > to_bytes:
         return jsonify(message='Songs [from] must be strictly less than [to] value'), 400
 
-    path = None
+    res = None
     try:
         path = get_model_songs().get_path(uuid)
+        res = read_binary_stream(from_bytes, to_bytes, path)
     except Exception:
         return jsonify(message='Unexpected error occured while retriving songs path'), 500
-
-    res = read_binary_stream(from_bytes, to_bytes, path)
 
     return jsonify(song=res), 206
 
